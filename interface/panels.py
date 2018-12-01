@@ -47,6 +47,12 @@ class InformationPanel():
         self.pokemon_image.anchor_x = self.pokemon_image.width
         self.pokemon_sprite = pyglet.sprite.Sprite(self.pokemon_image, self.background_1_sprite.width, self.background_1_sprite.width, batch=self.front)
 
+        # Load labels
+        self.label_name = pyglet.text.Label("Name: {}".format(self.data.name), font_name="Power Clear", x=30, y=440, font_size=12, batch=self.front)
+        self.label_abilities = pyglet.text.Label("Abilities: {}".format(self.data.abilities), font_name="Power Clear", x=30, y=420, font_size=14, batch=self.front)
+        self.label_abilities = pyglet.text.Label("WT: {}".format(self.data.weight), font_name="Power Clear", x=30, y=400, font_size=12, batch=self.front)
+        self.label_abilities = pyglet.text.Label("HT: {}".format(self.data.height), font_name="Power Clear", x=30, y=380, font_size=12, batch=self.front)
+
     def update_background_sprite(self, type_1, type_2=None):
         self.type_1 = type_1
         self.type_2 = None
