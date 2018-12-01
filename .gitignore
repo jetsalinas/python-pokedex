@@ -117,3 +117,4 @@ dmypy.json
 # Pokemon images
 resources/pokemon/*
 old/
+sandbox/
