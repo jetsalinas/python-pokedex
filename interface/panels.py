@@ -31,7 +31,8 @@ class InformationPanel():
         if isinstance(self.type_2, str):        
             self.background_2_image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
             self.background_2_sprite = pyglet.sprite.Sprite(self.background_2_image, batch=self.back)
-        
+            self.background_2_sprite.opacity = 150
+
         # Load initial pokemon image and sprite
         # Attempt to load jpg version if it exists
         # else, load png version
@@ -43,19 +44,8 @@ class InformationPanel():
             self.pokemon_image = pyglet.image.load('resources/pokemon/{}.png'.format(self.name.lower()))
         except(FileNotFoundError):
             raise FileNotFoundError("Invalid pokemon name.")
-        self.pokemon_sprite = pyglet.sprite.Sprite(self.pokemon_image, self.background_1_sprite.width, self.background_1_sprite.height, batch=self.front)
-
-    def update_pokemon_sprite(self, name):
-        try:
-            self.pokemon_image = pyglet.image.load('resources/pokemon/{}.jpg'.format(name.lower()))
-        except(FileNotFoundError):
-            pass
-        try:
-            self.pokemon_image = pyglet.image.load('resources/pokemon/{}.png'.format(name.lower()))
-        except(FileNotFoundError):
-            raise FileNotFoundError("Invalid pokemon name.")
-        self.pokemon = pyglet.sprite.Sprite(self.pokemon_image, self.background_1_sprite.width, self.background_2_sprite.height, batch=self.front)
-        pass
+        self.pokemon_image.anchor_x = self.pokemon_image.width
+        self.pokemon_sprite = pyglet.sprite.Sprite(self.pokemon_image, self.background_1_sprite.width, self.background_1_sprite.width, batch=self.front)
 
     def update_background_sprite(self, type_1, type_2=None):
         self.type_1 = type_1
@@ -68,6 +58,18 @@ class InformationPanel():
         # Made as an artifact of using pandas for data loading
         if isinstance(self.type_2, str):        
             self.background_2_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
+
+    def update_pokemon_sprite(self, name):
+        try:
+            self.pokemon_image = pyglet.image.load('resources/pokemon/{}.jpg'.format(name.lower()))
+        except(FileNotFoundError):
+            pass
+        try:
+            self.pokemon_image = pyglet.image.load('resources/pokemon/{}.png'.format(name.lower()))
+        except(FileNotFoundError):
+            raise FileNotFoundError("Invalid pokemon name.")
+        self.pokemon_image.anchor_x = self.pokemon_image.width
+        self.pokemon_sprite.image = self.pokemon_image
 
     def update(self, data):
         self.data = data
