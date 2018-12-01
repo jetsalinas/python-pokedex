@@ -1,5 +1,4 @@
 import pyglet
-import math
 from .colors import Color
 
 class InformationPanel():
@@ -23,14 +22,19 @@ class InformationPanel():
         self.type_1 = self.data.type1
         self.type_2 = self.data.type2
 
-        # Load type 1 and 2 background images and sprites
+        # Load initial type 1 and 2 background images and sprites
         self.background_1_image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1))
         self.background_1_sprite = pyglet.sprite.Sprite(self.background_1_image, batch=self.back)
-        if not math.isnan(self.type_2):        
+        
+        # Check if type_2 is a string or a NaN float
+        # Made as an artifact of using pandas for data loading
+        if isinstance(self.type_2, str):        
             self.background_2_image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
             self.background_2_sprite = pyglet.sprite.Sprite(self.background_2_image, batch=self.back)
         
         # Load initial pokemon image and sprite
+        # Attempt to load jpg version if it exists
+        # else, load png version
         try:
             self.pokemon_image = pyglet.image.load('resources/pokemon/{}.jpg'.format(self.name.lower()))
         except(FileNotFoundError):
@@ -50,7 +54,20 @@ class InformationPanel():
             self.pokemon_image = pyglet.image.load('resources/pokemon/{}.png'.format(name.lower()))
         except(FileNotFoundError):
             raise FileNotFoundError("Invalid pokemon name.")
-        self.pokemon = pyglet.sprite.Sprite(self.pokemon_image, self.background1.width, self.background2.height, batch=self.front)
+        self.pokemon = pyglet.sprite.Sprite(self.pokemon_image, self.background_1_sprite.width, self.background_2_sprite.height, batch=self.front)
+        pass
+
+    def update_background_sprite(self, type_1, type_2=None):
+        self.type_1 = type_1
+        self.type_2 = None
+
+        # Replace type_1 sprite background image
+        self.background_1_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1))
+     
+        # Check if type_2 is a string or a NaN float
+        # Made as an artifact of using pandas for data loading
+        if isinstance(self.type_2, str):        
+            self.background_2_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
 
     def update(self, data):
         self.data = data
@@ -59,8 +76,8 @@ class InformationPanel():
         self.type_1 = data.type1
         self.type_2 = data.type2
 
-        self.bg_image_1  = pyglet.image.load('resources/backgrounds/steel.png')
-        self.bg_sprite_1 = pyglet.sprite.Sprite(self.bg_image_1, batch=self.front)
+        self.update_background_sprite(type_1=self.type_1, type_2=self.type_2)
+        self.update_pokemon_sprite(name=self.name)
 
     def draw_self(self):
         self.back.draw()
