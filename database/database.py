@@ -94,7 +94,7 @@ class DataRow():
 
 class Database(DatabaseQuery):
 
-    def __init__(self, database="resources/data/data_test.csv"):
+    def __init__(self, database="resources/data/data.csv"):
         self.database_address = database
         self.dataframe = pd.read_csv(self.database_address)
         super().__init__(self.dataframe)
