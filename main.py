@@ -1,6 +1,8 @@
 import pyglet
 from database.database import Database
+from helpers.colors import Color
 
+# Get database
 database = Database()
 
 # Initialize windows
