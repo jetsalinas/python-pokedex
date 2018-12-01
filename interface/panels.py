@@ -1,16 +1,16 @@
 import pyglet
 from .colors import Color
 
+favorites = [0, 2, 3, 7]
+
 class InformationPanel():
 
     types  = ['bug', 'dark', 'dragon', 'electric', 'fairy', 'fight', 'fire',
                 'flying', 'ghost', 'grass', 'ground', 'ice', 'normal', 'poison',
                 'psychic', 'rock', 'steel', 'water']
 
-    def __init__(self, data, width=640, height=480):
+    def __init__(self, data,):
         self.data = data
-        self.width = width
-        self.height = height
         self.front = pyglet.graphics.Batch()
         self.back = pyglet.graphics.Batch()
         self.initialize_components()
@@ -53,6 +53,9 @@ class InformationPanel():
         self.label_weight = pyglet.text.Label("WT: {} kg".format(self.data.weight), font_name="Power Clear", x=30, y=400, font_size=12, batch=self.front)
         self.label_height = pyglet.text.Label("HT: {} m".format(self.data.height), font_name="Power Clear", x=30, y=380, font_size=12, batch=self.front)
 
+        self.width = self.background_1_image.width
+        self.height = self.background_1_image.height
+
     def update_background_sprite(self):
 
         # Replace type_1 sprite background image
@@ -91,6 +94,65 @@ class InformationPanel():
         self.update_background_sprite()
         self.update_pokemon_sprite()
         self.update_labels()
+
+    def draw_self(self):
+        self.back.draw()
+        self.front.draw()
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', (self.background_1_sprite.width, self.background_1_sprite.y,
+                                                   self.background_1_sprite.width, self.background_1_sprite.height,
+                                                   640,             self.background_1_sprite.height,
+                                                   640,             self.background_1_sprite.y)),
+                                          ('c3B', Color.WHITE*4))
+
+
+class Browser():
+
+    def __init__(self, database, x, y):
+        self.database = database
+        self.front = pyglet.graphics.Batch()
+        self.back = pyglet.graphics.Batch()
+
+
+        # Preload image tiles
+        self.select_active_image = pyglet.image.load('resources/tiles/select_active.png')
+        self.select_active_image.anchor_x = self.select_active_image.width//2
+        self.select_active_image.anchor_y = self.select_active_image.height//2
+        self.select_inactive_image = pyglet.image.load('resources/tiles/select_inactive.png')
+        self.select_inactive_image.anchor_x = self.select_inactive_image.width//2
+        self.select_inactive_image.anchor_y = self.select_inactive_image.height//2
+        self.star_active_image = pyglet.image.load('resources/tiles/fav_active.png')
+        self.star_active_image.anchor_x = self.star_active_image.width//2
+        self.star_active_image.anchor_y = self.star_active_image.height//2
+        self.star_inactive_image = pyglet.image.load('resources/tiles/fav_inactive.png')
+        self.star_inactive_image.anchor_x = self.star_inactive_image.width//2
+        self.star_inactive_image.anchor_y = self.star_inactive_image.height//2
+
+        # Set states
+        self.offset = 40
+        self.cycle_max = 10
+        self.tiles = []
+        self.tile_pos = (x + 2.5*self.offset, y, self.offset)
+        self.texts    = []
+        self.text_pos = (x + 30, y, self.offset)
+        self.stars    = []
+        self.star_pos = (x, y, self.offset)
+
+        for i in range(self.cycle_max):
+            self.tiles.append(pyglet.sprite.Sprite(self.select_inactive_image, batch=self.back, x=self.tile_pos[0], y=self.tile_pos[1]-self.tile_pos[2]*i))
+            self.stars.append(pyglet.sprite.Sprite(self.star_inactive_image, batch=self.back, x=self.star_pos[0], y=self.star_pos[1]-self.star_pos[2]*i))
+            self.stars[i].scale = self.tiles[i].height/self.stars[i].height
+            if i in favorites:
+                self.stars[i].color = Color.GREY
+            else:
+                self.stars[i].color = Color.WHITE
+            self.texts.append(pyglet.text.Label('{} - {}'.format(self.database[i].index, self.database[i].name)
+                            , batch=self.front, x=self.text_pos[0], font_size=15,
+                              y=self.text_pos[1] - self.text_pos[2]*i, anchor_y='center', font_name='Power Clear',
+                              color=Color.BLACK + tuple([255]) ) )
+
+        #setting the first items as the "selector"
+        self.tiles[0].image = self.select_active_image
+        self.texts[0].color = Color.WHITE + tuple([255])
 
     def draw_self(self):
         self.back.draw()

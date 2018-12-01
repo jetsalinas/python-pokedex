@@ -50,7 +50,7 @@ class DataRow():
     
     def __init__(self, serial):
         self.index = serial[0]
-        self.abilities = serial[1]
+        self.abilities = [i.strip("\'") for i in serial[1].strip('[').strip(']').split(',')]
         self.against_bug = serial[2]
         self.against_dark = serial[3]
         self.against_dragon = serial[4]
