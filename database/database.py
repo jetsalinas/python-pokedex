@@ -46,6 +46,12 @@ class DatabaseQuery():
     def first(self):
         return self.query[0]
 
+    def isempty(self):
+        if len(self.query) == 0:
+            return True
+        else:
+            return False
+
 class DataRow():
     
     def __init__(self, serial):
