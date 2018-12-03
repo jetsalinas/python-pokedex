@@ -2,8 +2,6 @@ import pyglet
 from .colors import Color
 from . import processes
 
-favorites = [0, 2, 3, 7]
-
 class InformationPanel():
 
     types  = ['bug', 'dark', 'dragon', 'electric', 'fairy', 'fight', 'fire',
@@ -75,7 +73,7 @@ class InformationPanel():
         try:
             self.pokemon_image = pyglet.image.load('resources/pokemon/{}.png'.format(self.data.name.lower()))
         except(FileNotFoundError):
-            raise FileNotFoundError("Invalid pokemon name.")
+           pass
         self.pokemon_image.anchor_x = self.pokemon_image.width
         self.pokemon_sprite.image = self.pokemon_image
 
@@ -107,8 +105,9 @@ class InformationPanel():
 
 class Browser():
 
-    def __init__(self, database, x, y):
+    def __init__(self, database, favorites, x, y):
         self.database = database
+        self.favorites = favorites
         self.front = pyglet.graphics.Batch()
         self.back = pyglet.graphics.Batch()
 
@@ -147,7 +146,11 @@ class Browser():
             self.tiles.append(pyglet.sprite.Sprite(self.select_inactive_image, batch=self.back, x=self.tile_pos[0], y=self.tile_pos[1]-self.tile_pos[2]*i))
             self.stars.append(pyglet.sprite.Sprite(self.star_inactive_image, batch=self.back, x=self.star_pos[0], y=self.star_pos[1]-self.star_pos[2]*i))
             self.stars[i].scale = self.tiles[i].height/self.stars[i].height
-            if i in favorites:
+            if self.bottom < self.cycle_max-1:
+                target_fav = i
+            else:
+                target_fav = self.top + i
+            if self.database[target_fav].index in self.favorites:
                 self.stars[i].color = Color.GREY
             else:
                 self.stars[i].color = Color.WHITE
@@ -214,6 +217,14 @@ class Browser():
             #     self.stars[i].color = color.grey
             # else:
             #     self.stars[i].color = color.white
+            if self.bottom < self.cycle_max-1:
+                target_fav = self.top
+            else:
+                target_fav = self.top + i
+            if self.database[target_fav].index in self.favorites:
+                self.stars[i].color = Color.GREY
+            else:
+                self.stars[i].color = Color.WHITE
             if i == self.selected:
                 self.tiles[i].image = self.select_active_image
                 self.texts[i].color = Color.WHITE + tuple([255])
@@ -223,6 +234,14 @@ class Browser():
         
         return self.index
 
+    def update_favs(self):
+        if self.index in self.favorites:
+            self.favorites.remove(self.index)
+            self.stars[self.selected].color = Color.WHITE
+        else:
+            self.favorites.append(self.index)
+            self.stars[self.selected].color = Color.GREY
+            
     def draw_self(self):
         self.back.draw()
         self.front.draw()
