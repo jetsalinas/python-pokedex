@@ -1,5 +1,6 @@
 import pyglet
 from .colors import Color
+from . import processes
 
 favorites = [0, 2, 3, 7]
 
@@ -49,7 +50,7 @@ class InformationPanel():
 
         # Load labels
         self.label_name = pyglet.text.Label("Name: {}".format(self.data.name), font_name="Power Clear", x=30, y=440, font_size=15, batch=self.front)
-        self.label_abilities = pyglet.text.Label("Abilities: {}".format(self.data.abilities), font_name="Power Clear", x=30, y=420, font_size=12, batch=self.front)
+        self.label_abilities = pyglet.text.Label("Abilities: {}".format(', '.join(self.data.abilities)), font_name="Power Clear", x=30, y=420, font_size=12, batch=self.front)
         self.label_weight = pyglet.text.Label("WT: {} kg".format(self.data.weight), font_name="Power Clear", x=30, y=400, font_size=12, batch=self.front)
         self.label_height = pyglet.text.Label("HT: {} m".format(self.data.height), font_name="Power Clear", x=30, y=380, font_size=12, batch=self.front)
 
@@ -80,7 +81,7 @@ class InformationPanel():
 
     def update_labels(self):
         self.label_name.text = "Name: {}".format(self.data.name)
-        self.label_abilities.text = "Abilities: {}".format(self.data.abilities)
+        self.label_abilities.text = "Abilities: {}".format(' '.join(self.data.abilities))
         self.label_weight.text = "WT: {} kg".format(self.data.weight)
         self.label_height.text = "HT: {} m".format(self.data.height)
 
@@ -104,14 +105,12 @@ class InformationPanel():
                                                    640,             self.background_1_sprite.y)),
                                           ('c3B', Color.WHITE*4))
 
-
 class Browser():
 
     def __init__(self, database, x, y):
         self.database = database
         self.front = pyglet.graphics.Batch()
         self.back = pyglet.graphics.Batch()
-
 
         # Preload image tiles
         self.select_active_image = pyglet.image.load('resources/tiles/select_active.png')
@@ -128,8 +127,15 @@ class Browser():
         self.star_inactive_image.anchor_y = self.star_inactive_image.height//2
 
         # Set states
+        if len(database) >= 10:
+            self.cycle_max = 10
+        else:
+            self.cycle_max = len(database)
+        self.index = 0
+        self.top = self.index
+        self.selected = self.index
+        self.bottom = self.index + self.cycle_max - 1
         self.offset = 40
-        self.cycle_max = 10
         self.tiles = []
         self.tile_pos = (x + 2.5*self.offset, y, self.offset)
         self.texts    = []
@@ -145,7 +151,7 @@ class Browser():
                 self.stars[i].color = Color.GREY
             else:
                 self.stars[i].color = Color.WHITE
-            self.texts.append(pyglet.text.Label('{} - {}'.format(self.database[i].index, self.database[i].name)
+            self.texts.append(pyglet.text.Label('{} - {}'.format(processes.add0(self.database[i].index), self.database[i].name)
                             , batch=self.front, x=self.text_pos[0], font_size=15,
                               y=self.text_pos[1] - self.text_pos[2]*i, anchor_y='center', font_name='Power Clear',
                               color=Color.BLACK + tuple([255]) ) )
@@ -153,6 +159,69 @@ class Browser():
         #setting the first items as the "selector"
         self.tiles[0].image = self.select_active_image
         self.texts[0].color = Color.WHITE + tuple([255])
+
+    def update_data(self, shift):
+        if shift >= self.cycle_max or shift <= -self.cycle_max:
+            # Shift entire list and selector
+            self.top += shift
+            self.index += shift
+            self.bottom += shift
+        elif self.index != self.bottom and shift > 0:
+            self.index += shift
+            self.selected += shift
+        elif self.index != self.top and shift < 0:
+            self.index += shift
+            self.selected += shift
+        elif self.index == self.top and shift < 0:
+            self.top += shift
+            self.index += shift
+            self.bottom += shift
+        elif self.index == self.bottom and shift > 0:
+            self.top += shift
+            self.index += shift
+            self.bottom += shift
+
+        if self.top < 0:
+            self.top = len(self.database) + self.top
+        if self.top > len(self.database) - 1:
+            self.top = self.top - len(self.database)
+        if self.bottom > len(self.database) - 1:
+            self.bottom = self.bottom - len(self.database)
+        if self.bottom < 0:
+            self.bottom = len(self.database) + self.bottom
+        if self.selected < 0:
+            self.selected = 0
+        if self.selected > self.cycle_max - 1:
+            self.selected = self.cycle_max - 1
+        if self.index > len(self.database) - 1:
+            self.index = self.index - len(self.database)
+        if self.index < 0:
+            self.index = len(self.database) + self.index
+ 
+        target_database = []
+        if self.bottom < self.top:
+            target_database = target_database + self.database[self.top:]
+            target_database = target_database + self.database[0:self.bottom+1]
+        elif self.top > self.bottom and self.bottom < self.cycle_max:
+            target_database = target_database + self.database[self.bottom:]
+            target_database = target_database + self.database[:self.top]
+        else: 
+            target_database = target_database + self.database[self.top:self.bottom+1]
+        for i in range(len(target_database)):
+            self.texts[i].text = "{} - {}".format(processes.add0(target_database[i].index), target_database[i].name)
+            # self.texts[i].text = '{} - {}'.format(processes.add0(self.data[list_top+i]['pokedex_number']), self.data[list_top+i]['name'])
+            # if self.data[list_top+i]['pokedex_number']-1 in favorites:
+            #     self.stars[i].color = color.grey
+            # else:
+            #     self.stars[i].color = color.white
+            if i == self.selected:
+                self.tiles[i].image = self.select_active_image
+                self.texts[i].color = Color.WHITE + tuple([255])
+            else:
+                self.tiles[i].image = self.select_inactive_image
+                self.texts[i].color = Color.BLACK + tuple([255])
+        
+        return self.index
 
     def draw_self(self):
         self.back.draw()
