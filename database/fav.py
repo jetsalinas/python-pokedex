@@ -19,3 +19,7 @@ class Favorites():
 
     def remove(self, key):
         self.favs = self.favs.difference({key})
+        with open("resources/data/fav.csv", "w") as fav_file:
+            csv_writer = csv.writer(fav_file)
+            for item in self.favs:
+                csv_writer.writerow([item])
