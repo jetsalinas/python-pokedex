@@ -3,7 +3,7 @@ from pyglet.window import key
 from database.database import Database
 from database.fav import Favorites
 from interface.colors import Color
-from interface.panels import InformationPanel, Browser
+from interface.panels import InformationPanel, Browser, SearchPanel
 
 # Get resources
 database = Database()
@@ -20,6 +20,7 @@ pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
 
 information = InformationPanel(database.index(current_pokemon))
 browser = Browser(database, favorites, x=information.width+30, y=window.height-90)
+search_panel = SearchPanel(x=information.width+30, y=window.height+15)
 
 def update_information_panel(dt):
     information.update(database[0])
@@ -30,15 +31,19 @@ def on_key_press(symbol, mod):
     if symbol in key_shifts:
         current_pokemon = browser.update_data(key_shifts[symbol])
         information.update(database.index(current_pokemon))
-
-    if symbol == key.ENTER:
+    elif symbol == key.TAB:
         browser.update_favs()
+    elif symbol == key.BACKSPACE:
+        search_panel.handle_backspace()
+    elif str.isalpha(chr(symbol)):
+        search_panel.handle_char(chr(symbol))
 
 @window.event
 def on_draw():
     window.clear()
     information.draw_self()
     browser.draw_self()
+    search_panel.draw_self()
 
 if __name__ == "__main__":
     pyglet.app.run()

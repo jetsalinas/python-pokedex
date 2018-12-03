@@ -239,3 +239,24 @@ class Browser():
     def draw_self(self):
         self.back.draw()
         self.front.draw()
+
+class SearchPanel():
+
+    def __init__(self, x, y):
+        self.front = pyglet.graphics.Batch()
+        self.back = pyglet.graphics.Batch()
+        self.search_string = ""
+        self.label = pyglet.text.Label(text="", font_name="Power Clear", font_size=14, x=380, y=440, batch=self.front, color=Color.BLACK+tuple([255]), anchor_x="left", anchor_y="center")
+
+    def draw_self(self):
+        self.back.draw()
+        self.front.draw()
+
+    def handle_backspace(self):
+        self.search_string = self.search_string[:-1]
+        self.label.text = self.search_string
+
+    def handle_char(self, key):
+        self.search_string += key.lower()
+        self.search_string = self.search_string.capitalize()
+        self.label.text = self.search_string
