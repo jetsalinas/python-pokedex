@@ -20,21 +20,27 @@ pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
 
 information = InformationPanel(database.index(current_pokemon))
 browser = Browser(database, favorites, x=information.width+30, y=window.height-90)
-search_panel = SearchPanel(x=information.width+30, y=window.height+15)
+search_panel = SearchPanel(database, x=information.width+30, y=window.height+15)
 
 def update_information_panel(dt):
     information.update(database[0])
 
 @window.event
 def on_key_press(symbol, mod):
+    global database, browser
     key_shifts = {key.DOWN: 1, key.UP: -1, key.RIGHT: 10, key.LEFT: -10, key.PAGEDOWN: 50, key.PAGEUP: -50}
     if symbol in key_shifts:
         current_pokemon = browser.update_data(key_shifts[symbol])
         information.update(database.index(current_pokemon))
-    elif symbol == key.TAB:
+    elif symbol == key.SPACE:
         browser.update_favs()
     elif symbol == key.BACKSPACE:
         search_panel.handle_backspace()
+    elif symbol == key.ENTER:
+        database = search_panel.handle_enter()
+        current_pokemon = database.first().index
+        information.update(database.first())
+        browser.update_database(database)
     elif str.isalpha(chr(symbol)):
         search_panel.handle_char(chr(symbol))
 

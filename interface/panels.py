@@ -225,8 +225,18 @@ class Browser():
             else:
                 self.tiles[i].image = self.select_inactive_image
                 self.texts[i].color = Color.BLACK + tuple([255])
+            self.tiles[i].visible = True
+            self.stars[i].visible = True
         
         return self.index
+
+    def clear_browser(self):
+        for text in self.texts:
+            text.text = ""
+        for sprite in self.tiles:
+            sprite.visible = False
+        for star in self.stars:
+            star.visible = False
 
     def update_favs(self):
         if self.index in self.favorites:
@@ -236,17 +246,32 @@ class Browser():
             self.favorites.append(self.index)
             self.stars[self.selected].color = Color.GREY
             
+    def update_database(self, database):
+        self.database = database
+
+        if len(database) >= 10:
+            self.cycle_max = 10
+        else:
+            self.cycle_max = len(self.database)
+        self.index = 0
+        self.top = self.index
+        self.selected = self.index
+        self.bottom = self.index + self.cycle_max - 1
+        self.clear_browser()
+        self.update_data(0)    
+
     def draw_self(self):
         self.back.draw()
         self.front.draw()
 
 class SearchPanel():
 
-    def __init__(self, x, y):
+    def __init__(self, database, x, y):
         self.front = pyglet.graphics.Batch()
         self.back = pyglet.graphics.Batch()
+        self.database = database
         self.search_string = ""
-        self.label = pyglet.text.Label(text="", font_name="Power Clear", font_size=14, x=380, y=440, batch=self.front, color=Color.BLACK+tuple([255]), anchor_x="left", anchor_y="center")
+        self.label = pyglet.text.Label(text="Search...", font_name="Power Clear", font_size=14, x=380, y=440, batch=self.front, color=Color.BLACK+tuple([255]), anchor_x="left", anchor_y="center")
 
     def draw_self(self):
         self.back.draw()
@@ -260,3 +285,14 @@ class SearchPanel():
         self.search_string += key.lower()
         self.search_string = self.search_string.capitalize()
         self.label.text = self.search_string
+
+    def handle_enter(self):
+        if self.search_string == "":
+            return self.database
+        self.query = self.database.filter_by_name(self.search_string)
+        if self.query != None:
+            return self.query
+        else:
+            self.label.text = "No results..."
+            return self.database
+        
