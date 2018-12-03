@@ -287,9 +287,20 @@ class SearchPanel():
         self.label.text = self.search_string
 
     def handle_enter(self):
+        types  = ['bug', 'dark', 'dragon', 'electric', 'fairy', 'fight', 'fire',
+                       'flying', 'ghost', 'grass', 'ground', 'ice', 'normal', 'poison',
+                       'psychic', 'rock', 'steel', 'water']
+
         if self.search_string == "":
             return self.database
-        self.query = self.database.filter_by_name(self.search_string)
+        elif self.search_string.lower() == "legendary":
+            self.query = self.database.filter_by_legendary(True)
+        elif self.search_string.lower() == "common":
+            self.query = self.database.filter_by_legendary(False)
+        elif self.search_string.lower() in types:
+            self.query = self.database.filter_by_type(self.search_string.lower())
+        else:
+            self.query = self.database.filter_by_name(self.search_string)
         if self.query != None and not self.query.isempty():
             return self.query
         else:

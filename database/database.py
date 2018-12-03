@@ -37,8 +37,8 @@ class DatabaseQuery():
             query = 1
         else:
             query = 0
-            data_query = self.dataframe.loc[(self.dataframe.is_legendary == query)]
-            return DatabaseQuery(data_query)
+        data_query = self.dataframe.loc[(self.dataframe.is_legendary == query)]
+        return DatabaseQuery(data_query)
 
     def index(self, key):
         return self.query[key]
