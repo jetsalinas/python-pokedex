@@ -12,6 +12,10 @@ class Favorites():
 
     def append(self, key):
         self.favs = self.favs.union({key})
+        with open("resources/data/fav.csv", "w") as fav_file:
+            csv_writer = csv.writer(fav_file)
+            for item in self.favs:
+                csv_writer.writerow([item])
 
     def remove(self, key):
         self.favs = self.favs.difference({key})
