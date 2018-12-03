@@ -290,7 +290,7 @@ class SearchPanel():
         if self.search_string == "":
             return self.database
         self.query = self.database.filter_by_name(self.search_string)
-        if self.query != None:
+        if self.query != None and not self.query.isempty():
             return self.query
         else:
             self.label.text = "No results..."
