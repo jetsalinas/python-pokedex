@@ -1,4 +1,5 @@
 import pyglet
+from pyglet.window import key
 from database.database import Database
 from interface.colors import Color
 from interface.panels import InformationPanel, Browser
@@ -20,6 +21,12 @@ browser = Browser(database, x=information.width+30, y=window.height-90)
 
 def update_information_panel(dt):
     information.update(current_pokemon)
+
+@window.event
+def on_key_press(symbol, mod):
+    key_shifts = {key.DOWN: 1, key.UP: -1, key.RIGHT: 10, key.LEFT: -10, key.PAGEDOWN: 50, key.PAGEUP: -50}
+    if symbol in key_shifts:
+        browser.update_data(key_shifts[symbol])
 
 @window.event
 def on_draw():
