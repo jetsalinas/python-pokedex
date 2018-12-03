@@ -32,7 +32,6 @@ def on_key_press(symbol, mod):
         information.update(database.index(current_pokemon))
 
     if symbol == key.ENTER:
-        print("Updating favs")
         browser.update_favs()
 
 @window.event

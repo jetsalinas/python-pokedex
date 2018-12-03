@@ -212,15 +212,9 @@ class Browser():
             target_database = target_database + self.database[self.top:self.bottom+1]
         for i in range(len(target_database)):
             self.texts[i].text = "{} - {}".format(processes.add0(target_database[i].index), target_database[i].name)
-            # self.texts[i].text = '{} - {}'.format(processes.add0(self.data[list_top+i]['pokedex_number']), self.data[list_top+i]['name'])
-            # if self.data[list_top+i]['pokedex_number']-1 in favorites:
-            #     self.stars[i].color = color.grey
-            # else:
-            #     self.stars[i].color = color.white
-            if self.bottom < self.cycle_max-1:
-                target_fav = self.top
-            else:
-                target_fav = self.top + i
+            target_fav = self.top + i
+            if target_fav > len(self.database) - 1:
+                target_fav = target_fav - len(self.database)
             if self.database[target_fav].index in self.favorites:
                 self.stars[i].color = Color.GREY
             else:
