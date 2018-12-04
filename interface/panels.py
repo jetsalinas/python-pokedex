@@ -42,6 +42,9 @@ class InformationPanel():
         self.background_1_image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1))
         self.background_1_sprite = pyglet.sprite.Sprite(self.background_1_image, batch=self.back)
 
+        # self.type_1_image = pyglet.image.load('resources/types/{}.png'.format(self.type_1.lower()))
+        # self.type_1_sprite = pyglet.sprite.Sprite(self.type_1_image, batch=self.front)
+
         # Check if type_2 is a string or a NaN float
         # Made as an artifact of using pandas for data loading
         if isinstance(self.type_2, str):
@@ -101,17 +104,17 @@ class InformationPanel():
 
         # Replace type_1 sprite background image
         self.background_1_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1))
-        self.type_1_sprite.image = pyglet.image.load('resources/types/{}.png'.format(self.type_1.lower()))
+        # self.type_1_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1.lower()))
 
         # Check if type_2 is a string or a NaN float
         # Made as an artifact of using pandas for data loading
         if isinstance(self.type_2, str):
             if self.type_2 == 'none':
                 self.background_2_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1))
-                self.type_2_sprite.image = pyglet.image.load('resources/types/{}.png'.format(self.type_1.lower()))
+                # self.type_2_sprite.image = pyglet.image.load('resources/types/{}.png'.format(self.type_1.lower()))
             else:
                 self.background_2_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
-                self.type_2_sprite.image = pyglet.image.load('resources/types/{}.png'.format(self.type_2.lower()))
+                # self.type_2_sprite.image = pyglet.image.load('resources/types/{}.png'.format(self.type_2.lower()))
 
 
     def update_pokemon_sprite(self):
