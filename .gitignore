@@ -118,3 +118,4 @@ dmypy.json
 resources/pokemon/*
 old/
 sandbox/
+resources/data/fav.csv
