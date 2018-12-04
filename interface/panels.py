@@ -302,7 +302,7 @@ class SearchPanel():
         types  = ['bug', 'dark', 'dragon', 'electric', 'fairy', 'fight', 'fire',
                        'flying', 'ghost', 'grass', 'ground', 'ice', 'normal', 'poison',
                        'psychic', 'rock', 'steel', 'water']
-        stats  = ['hp', 'attack', 'defense', 'speed', 'sp_defense', 'sp_attack']
+        stats  = ['hp', 'attack', 'defense', 'speed', 'spdefense', 'spattack']
 
         if self.search_string == "":
             return self.database
@@ -313,7 +313,7 @@ class SearchPanel():
         elif self.search_string.lower() in types:
             self.query = self.database.filter_by_type(self.search_string.lower())
         elif self.search_string.lower() in stats:
-            self.query = self.database.filter_by_stat(self.search_string.lower())
+            self.query = self.database.sort_by_stat(self.search_string.lower())
         else:
             self.query = self.database.filter_by_name(self.search_string)
         if self.query != None and not self.query.isempty():
