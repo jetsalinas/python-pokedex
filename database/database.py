@@ -2,7 +2,7 @@ import csv
 import pandas as pd
 
 class DatabaseQuery():
-    
+
     def __init__(self, dataframe):
         self.query = []
         self.dataframe = dataframe
@@ -32,6 +32,13 @@ class DatabaseQuery():
         data_query = self.dataframe.loc[(self.dataframe.type1 == pokemon_type.lower()) | (self.dataframe.type2 == pokemon_type.lower())]
         return DatabaseQuery(data_query)
 
+    def filter_by_stat(self, stat):
+        data_query = self.dataframe.loc[(self.dataframe.hp         == pokemon_type.lower()) | (self.dataframe.attack    == pokemon_type.lower()) |
+                                        (self.dataframe.defense    == pokemon_type.lower()) | (self.dataframe.speed     == pokemon_type.lower()) |
+                                        (self.dataframe.sp_defense == pokemon_type.lower()) | (self.dataframe.sp_attack == pokemon_type.lower()) |
+                                        (self.dataframe.base_total == pokemon_type.lower()) ]
+        return DatabaseQuery(data_query)
+
     def filter_by_legendary(self, value):
         if value == True:
             query = 1
@@ -53,7 +60,7 @@ class DatabaseQuery():
             return False
 
 class DataRow():
-    
+
     def __init__(self, serial):
         self.index = serial[0]
         self.abilities = [i.strip("\'") for i in serial[1].strip('[').strip(']').split(',')]
