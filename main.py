@@ -19,8 +19,8 @@ database = Database()
 favorites = Favorites()
 current_pokemon = 0
 pyglet.font.add_file("resources/fonts/pkmndp.ttf")
-# icon = pyglet.image.load("resources/tiles/icon.png")
-# cursor = pyglet.image.load("resources/tiles/cursor.png")
+icon = pyglet.image.load("resources/tiles/icon.png")
+cursor = pyglet.image.load("resources/tiles/cursor.png")
 
 # Load music
 try:
@@ -36,8 +36,6 @@ except pyglet.media.sources.riff.WAVEFormatException:
 
 # Initialize windows
 window = pyglet.window.Window(caption='Pokedex V1.0', width=640, height=480)
-# window = pyglet.window.Window(caption='Pokedex V1.0', width=640, height=480, icon=icon)
-# window.set_mouse_cursor(cursor)
 
 # Set blending modes
 pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
