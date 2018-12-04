@@ -330,12 +330,12 @@ class ScrollBar():
                          left,    up)
         self.width   = right-left
         self.height  = up-down
-        self.maximum = up
-        self.minimum = down
         self.ratio   = len(database)/self.height
         self.bar_img = pyglet.image.load('resources/tiles/scroll_bar.png')
         self.bar_img.anchor_x = int(self.bar_img.width/2)
         self.bar_img.anchor_y = int(self.bar_img.height/2)
+        self.maximum = up
+        self.minimum = down + self.bar_img.height
         self.bar   = pyglet.sprite.Sprite(self.bar_img, x=right-self.width/2, y=up)
 
     def update_from_scroll(self, dy):
