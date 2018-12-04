@@ -1,4 +1,17 @@
+"""
+Module that contains color tuples for python-pokedex
+
+:Author:    Daniel Montecastro
+:Author:    Jose Enrico Salinas
+:Version:   20181204
+"""
+
+
 class Color():
+    """
+    Class that contains color tuples as properties
+    """
+
     RED = (255, 0, 0)
     GREEN = (0, 255, 0)
     BLUE = (0, 0, 255)
