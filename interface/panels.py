@@ -24,9 +24,12 @@ class InformationPanel():
         # Check if type_2 is a string or a NaN float
         # Made as an artifact of using pandas for data loading
         if isinstance(self.type_2, str):
-            self.background_2_image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
-            self.background_2_sprite = pyglet.sprite.Sprite(self.background_2_image, batch=self.back)
-            self.background_2_sprite.opacity = 150
+            if self.type_2 == 'none':
+                self.background_2_image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1))
+                self.background_2_sprite = pyglet.sprite.Sprite(self.background_2_image, batch=self.back)
+            else:
+                self.background_2_image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
+                self.background_2_sprite = pyglet.sprite.Sprite(self.background_2_image, batch=self.back)
 
         # Load initial pokemon image and sprite
         # Attempt to load jpg version if it exists
@@ -41,12 +44,17 @@ class InformationPanel():
             raise FileNotFoundError("Invalid pokemon name.")
         self.pokemon_image.anchor_x = self.pokemon_image.width
         self.pokemon_sprite = pyglet.sprite.Sprite(self.pokemon_image, self.background_1_sprite.width, self.background_1_sprite.width, batch=self.front)
+        #self.type_1_image = pyglet.image.load('resources/types/{}.png'.format(self.type_1.lower()))
+        #self.type_2_image = pyglet.image.load('resources/types/{}.png'.format(self.type_2.lower()))
+        #self.type_1_sprite = (self.type_1_image, self.pokemon_sprite.x - self.pokemon_sprite.width + 20, self.pokemon_sprite.y - 10, batch=self.front)
+        #self.type_2_sprite = (self.type_2_image, self.pokemon_sprite.x - 20, self.pokemon_sprite.y - 10, batch=self.front)
 
         # Load labels
         self.label_name = pyglet.text.Label("Name: {}".format(self.data.name), font_name="Power Clear", x=30, y=440, font_size=15, batch=self.front)
-        self.label_abilities = pyglet.text.Label("Abilities: {}".format(', '.join(self.data.abilities)), font_name="Power Clear", x=30, y=420, font_size=12, batch=self.front)
-        self.label_weight = pyglet.text.Label("WT: {} kg".format(self.data.weight), font_name="Power Clear", x=30, y=400, font_size=12, batch=self.front)
-        self.label_height = pyglet.text.Label("HT: {} m".format(self.data.height), font_name="Power Clear", x=30, y=380, font_size=12, batch=self.front)
+        self.label_abilities_title = pyglet.text.Label("Abilities:", font_name="Power Clear", x=30, y=420, font_size=12, batch=self.front)
+        self.label_abilities = pyglet.text.Label("{}".format(' | '.join(self.data.abilities)), font_name="Power Clear", x=40, y=400, font_size=12, batch=self.front)
+        self.label_weight = pyglet.text.Label("WT: {} kg".format(self.data.weight), font_name="Power Clear", x=30, y=375, font_size=12, batch=self.front)
+        self.label_height = pyglet.text.Label("HT: {} m".format(self.data.height), font_name="Power Clear", x=30, y=355, font_size=12, batch=self.front)
 
         self.width = self.background_1_image.width
         self.height = self.background_1_image.height
@@ -69,11 +77,18 @@ class InformationPanel():
 
         # Replace type_1 sprite background image
         self.background_1_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1))
+        self.type_1_sprite.image = pyglet.image.load('resources/types/{}.png'.format(self.type_1.lower()))
 
         # Check if type_2 is a string or a NaN float
         # Made as an artifact of using pandas for data loading
         if isinstance(self.type_2, str):
-            self.background_2_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
+            if self.type_2 == 'none':
+                self.background_2_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1))
+                self.type_2_sprite.image = pyglet.image.load('resources/types/{}.png'.format(self.type_1.lower()))
+            else:
+                self.background_2_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
+                self.type_2_sprite.image = pyglet.image.load('resources/types/{}.png'.format(self.type_2.lower()))
+
 
     def update_pokemon_sprite(self):
         try:
@@ -89,7 +104,7 @@ class InformationPanel():
 
     def update_labels(self):
         self.label_name.text = "Name: {}".format(self.data.name)
-        self.label_abilities.text = "Abilities: {}".format(' '.join(self.data.abilities))
+        self.label_abilities.text = "{}".format(' | '.join(self.data.abilities))
         self.label_weight.text = "WT: {} kg".format(self.data.weight)
         self.label_height.text = "HT: {} m".format(self.data.height)
 
@@ -278,14 +293,25 @@ class Browser():
 
 class SearchPanel():
 
-    def __init__(self, database, x, y):
+    def __init__(self, database, x, y, window):
         self.front = pyglet.graphics.Batch()
         self.back = pyglet.graphics.Batch()
+        self.square = (           x,             y,
+                                  x, window.height,
+                       window.width, window.height,
+                       window.width,             y)
         self.database = database
         self.search_string = ""
-        self.label = pyglet.text.Label(text="Search...", font_name="Power Clear", font_size=14, x=380, y=440, batch=self.front, color=Color.BLACK+tuple([255]), anchor_x="left", anchor_y="center")
+        self.label = pyglet.text.Label(text="Search...", font_name="Power Clear", font_size=14, x=430, y=450, batch=self.front, color=Color.BLACK+tuple([255]), anchor_x="left", anchor_y="center")
+        self.bar_image = pyglet.image.load('resources/tiles/search_bar.png')
+        self.bar_image.anchor_y = int(self.bar_image.height/2)
+        self.bar = pyglet.sprite.Sprite(self.bar_image, x + 30, y = 450, batch=self.back)
+        self.icon_image = pyglet.image.load('resources/tiles/search_icon.png')
+        self.icon_image.anchor_y = int(self.icon_image.height/2)
+        self.icon = pyglet.sprite.Sprite(self.icon_image, x + 40, y = 450, batch=self.front)
 
     def draw_self(self):
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', self.square), ('c3B', Color.GREY * 4))
         self.back.draw()
         self.front.draw()
 
@@ -295,6 +321,7 @@ class SearchPanel():
 
     def handle_char(self, key):
         self.search_string += key.lower()
+        self.search_string = self.search_string[:15]
         self.search_string = self.search_string.capitalize()
         self.label.text = self.search_string
 
@@ -335,23 +362,15 @@ class ScrollBar():
         self.bar_img.anchor_x = int(self.bar_img.width/2)
         self.bar_img.anchor_y = int(self.bar_img.height/2)
         self.maximum = up
-        self.minimum = down + self.bar_img.height
+        self.minimum = down
         self.bar   = pyglet.sprite.Sprite(self.bar_img, x=right-self.width/2, y=up)
 
-    def update_from_scroll(self, dy):
-        self.bar.y += dy
-        if self.bar.y > self.maximum:
-            self.bar.y = self.minimum
-        elif self.bar.y < self.minimum:
-            self.bar.y = self.maximum
-        
-    def update_from_key(self, top):
+    def update(self, top):
         self.bar.y = int(self.maximum-((top+5)/self.ratio))
 
     def update_database(self, database):
         self.ratio = len(database)/self.height
 
     def draw_self(self):
-        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', self.square),
-                                          ('c3B', Color.GREY * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', self.square), ('c3B', Color.GREY * 4))
         self.bar.draw()
