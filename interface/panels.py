@@ -500,6 +500,7 @@ class ScrollBar():
         """
         self.bar.y = int(self.maximum-((top+5)/self.ratio))
 
+
     def update_database(self, database):
         """
         Updates the scroll ticks based on the new database

@@ -78,7 +78,7 @@ def on_key_press(symbol, mod):
         # Select a new pokemon
         current_pokemon = browser.update_data(key_shifts[symbol])
         information.update(database.index(current_pokemon))
-        scroll_bar.update_from_key(browser.top)
+        scroll_bar.update(browser.top)
     elif symbol == key.SPACE:
         # Toggle favorite on currently selected pokemon
         browser.update_favs()
