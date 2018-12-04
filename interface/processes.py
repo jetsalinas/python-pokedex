@@ -26,13 +26,12 @@ def vertex_create(stats, x, y, limit=255, size=100):
     d1, d2 = x,                 y - stats[3] * dz   #Spd  vertex
     e1, e2 = x - stats[4] * dx, y - stats[4] * dy   #SAtk vertex
     f1, f2 = x - stats[5] * dx, y + stats[5] * dy   #SDef vertex
-    return (a1, a2, b1, b2, c1, c2, d1, d2, e1, e2, f1, f2)
+    return [a1, a2, b1, b2, c1, c2, d1, d2, e1, e2, f1, f2]
 
 
 #allows for "transforming" of the polygon (instead of instantly changing shape)
 def vertex_change(previous, current):
-    previous = list(previous)
     for stat in range(len(previous)):
         if previous[stat] < current[stat]: previous[stat] += int(current[stat]/previous[stat])
         if previous[stat] > current[stat]: previous[stat] -= int(previous[stat]/current[stat])
-    return tuple([int(i) for i in previous])
+    return [int(i) for i in previous]

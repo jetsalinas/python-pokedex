@@ -4,10 +4,6 @@ from . import processes
 
 class InformationPanel():
 
-    types  = ['bug', 'dark', 'dragon', 'electric', 'fairy', 'fight', 'fire',
-                'flying', 'ghost', 'grass', 'ground', 'ice', 'normal', 'poison',
-                'psychic', 'rock', 'steel', 'water']
-
     def __init__(self, data,):
         self.data = data
         self.front = pyglet.graphics.Batch()
@@ -24,10 +20,10 @@ class InformationPanel():
         # Load initial type 1 and 2 background images and sprites
         self.background_1_image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1))
         self.background_1_sprite = pyglet.sprite.Sprite(self.background_1_image, batch=self.back)
-        
+
         # Check if type_2 is a string or a NaN float
         # Made as an artifact of using pandas for data loading
-        if isinstance(self.type_2, str):        
+        if isinstance(self.type_2, str):
             self.background_2_image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
             self.background_2_sprite = pyglet.sprite.Sprite(self.background_2_image, batch=self.back)
             self.background_2_sprite.opacity = 150
@@ -55,14 +51,28 @@ class InformationPanel():
         self.width = self.background_1_image.width
         self.height = self.background_1_image.height
 
+        self.hexagon_image = pyglet.image.load('resources/tiles/stat_wheel.png')
+        self.hexagon_image.anchor_x = int(self.hexagon_image.width/2)
+        self.hexagon_image.anchor_y = int(self.hexagon_image.height/2)
+        self.hexagon_sprite = pyglet.sprite.Sprite(self.hexagon_image, self.background_1_sprite.width/2, self.hexagon_image.height/2 + 25, batch=self.front)
+
+        self.stats_image = pyglet.image.load('resources/tiles/stat_names.png')
+        self.stats_image.anchor_x = int(self.stats_image.width/2) + 10
+        self.stats_image.anchor_y = int(self.stats_image.height/2)
+        self.stats_sprite = pyglet.sprite.Sprite(self.stats_image, self.hexagon_sprite.x, self.hexagon_sprite.y, batch=self.front)
+
+        self.stats = [self.data.hp, self.data.attack, self.data.defense, self.data.speed, self.data.sp_defense, self.data.sp_attack]
+        self.current_stats = processes.vertex_create(self.stats, self.hexagon_sprite.x, self.hexagon_sprite.y)
+        self.previous_stats = self.current_stats
+
     def update_background_sprite(self):
 
         # Replace type_1 sprite background image
         self.background_1_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_1))
-     
+
         # Check if type_2 is a string or a NaN float
         # Made as an artifact of using pandas for data loading
-        if isinstance(self.type_2, str):        
+        if isinstance(self.type_2, str):
             self.background_2_sprite.image = pyglet.image.load('resources/backgrounds/{}.png'.format(self.type_2))
 
     def update_pokemon_sprite(self):
@@ -89,6 +99,8 @@ class InformationPanel():
         self.name = data.name
         self.type_1 = data.type1
         self.type_2 = data.type2
+        self.stats = [data.hp, data.attack, data.defense, data.speed, data.sp_defense, data.sp_attack]
+        self.current_stats = processes.vertex_create(self.stats, self.hexagon_sprite.x, self.hexagon_sprite.y)
 
         self.update_background_sprite()
         self.update_pokemon_sprite()
@@ -200,7 +212,7 @@ class Browser():
             self.index = self.index - len(self.database)
         if self.index < 0:
             self.index = len(self.database) + self.index
- 
+
         target_database = []
         if self.bottom < self.top:
             target_database = target_database + self.database[self.top:]
@@ -208,7 +220,7 @@ class Browser():
         elif self.top > self.bottom and self.bottom < self.cycle_max:
             target_database = target_database + self.database[self.bottom:]
             target_database = target_database + self.database[:self.top]
-        else: 
+        else:
             target_database = target_database + self.database[self.top:self.bottom+1]
         for i in range(len(target_database)):
             self.texts[i].text = "{} - {}".format(processes.add0(target_database[i].index), target_database[i].name)
@@ -227,7 +239,7 @@ class Browser():
                 self.texts[i].color = Color.BLACK + tuple([255])
             self.tiles[i].visible = True
             self.stars[i].visible = True
-        
+
         return self.index
 
     def clear_browser(self):
@@ -245,7 +257,7 @@ class Browser():
         else:
             self.favorites.append(self.index)
             self.stars[self.selected].color = Color.GREY
-            
+
     def update_database(self, database):
         self.database = database
 
@@ -258,7 +270,7 @@ class Browser():
         self.selected = self.index
         self.bottom = self.index + self.cycle_max - 1
         self.clear_browser()
-        self.update_data(0)    
+        self.update_data(0)
 
     def draw_self(self):
         self.back.draw()
@@ -290,6 +302,7 @@ class SearchPanel():
         types  = ['bug', 'dark', 'dragon', 'electric', 'fairy', 'fight', 'fire',
                        'flying', 'ghost', 'grass', 'ground', 'ice', 'normal', 'poison',
                        'psychic', 'rock', 'steel', 'water']
+        stats  = ['hp', 'attack', 'defense', 'speed', 'sp_defense', 'sp_attack']
 
         if self.search_string == "":
             return self.database
@@ -299,6 +312,8 @@ class SearchPanel():
             self.query = self.database.filter_by_legendary(False)
         elif self.search_string.lower() in types:
             self.query = self.database.filter_by_type(self.search_string.lower())
+        elif self.search_string.lower() in stats:
+            self.query = self.database.filter_by_stat(self.search_string.lower())
         else:
             self.query = self.database.filter_by_name(self.search_string)
         if self.query != None and not self.query.isempty():
@@ -306,4 +321,37 @@ class SearchPanel():
         else:
             self.label.text = "No results..."
             return self.database
+
+class ScrollBar():
+    def __init__(self, database, up=0, down=0, left=0, right=0):
+        self.square  =  (right,   up,
+                         right, down,
+                         left,  down,
+                         left,    up)
+        self.width   = right-left
+        self.height  = up-down
+        self.ratio   = len(database)/self.height
+        self.bar_img = pyglet.image.load('resources/tiles/scroll_bar.png')
+        self.bar_img.anchor_x = int(self.bar_img.width/2)
+        self.bar_img.anchor_y = int(self.bar_img.height/2)
+        self.maximum = up
+        self.minimum = down + self.bar_img.height
+        self.bar   = pyglet.sprite.Sprite(self.bar_img, x=right-self.width/2, y=up)
+
+    def update_from_scroll(self, dy):
+        self.bar.y += dy
+        if self.bar.y > self.maximum:
+            self.bar.y = self.minimum
+        elif self.bar.y < self.minimum:
+            self.bar.y = self.maximum
         
+    def update_from_key(self, top):
+        self.bar.y = int(self.maximum-((top+5)/self.ratio))
+
+    def update_database(self, database):
+        self.ratio = len(database)/self.height
+
+    def draw_self(self):
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', self.square),
+                                          ('c3B', Color.GREY * 4))
+        self.bar.draw()
