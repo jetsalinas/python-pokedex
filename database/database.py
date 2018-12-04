@@ -1,9 +1,27 @@
+"""
+Database engine for python-pokedex
+
+:Author:    Jose Enrico Salinas
+:Version:   20181204
+"""
+
 import csv
 import pandas as pd
 
 class DatabaseQuery():
+    """
+    A database query for python-pokedex
+    Uses pandas library to filter and sort data
+    """
 
     def __init__(self, dataframe):
+        """
+        Creates a new dictionary query from a pandas dataframe
+
+        Args:
+            dataframe (pandas.DataFrame): a pandas dataframe containing pokemon information
+        """
+
         self.query = []
         self.dataframe = dataframe
         for index, row in dataframe.iterrows():
@@ -25,14 +43,38 @@ class DatabaseQuery():
         return len(self.query)
 
     def filter_by_name(self, name):
+        """
+        Finds a pokemon with specified name
+
+        Args:
+            name(str): The name of the pokemon
+        Returns:
+            DatabaseQuery: contains the pokemon row if it exists
+        """
         data_query = self.dataframe.loc[self.dataframe.name == name]
         return DatabaseQuery(data_query)
 
     def filter_by_type(self, pokemon_type):
+        """
+        Finds all pokemon with specified type
+
+        Args:
+            pokemon_type(str): The lowercase type query
+        Returns:
+            DatabaseQuery: contains all pokemon with specified type if they exist
+        """
         data_query = self.dataframe.loc[(self.dataframe.type1 == pokemon_type.lower()) | (self.dataframe.type2 == pokemon_type.lower())]
         return DatabaseQuery(data_query)
 
     def filter_by_legendary(self, value):
+        """
+        Finds all pokemon by either legendary or common
+
+        Args:
+            value(bool): Get legendary pokemon if true, else get common pokemon
+        Returns:
+            DatabaseQuery: contains all pokemon that are either legendary or common 
+        """
         if value == True:
             query = 1
         else:
@@ -41,30 +83,74 @@ class DatabaseQuery():
         return DatabaseQuery(data_query)
 
     def sort_by_hp(self):
+        """
+        Sorts all pokemon by hp in descending order
+
+        Returns:
+            DatabaseQuery: contains all pokemon sorted by hp in descending order
+        """
         data_query = self.dataframe.sort_values(by=["hp"], ascending=False)
         return data_query
 
     def sort_by_attack(self):
+        """
+        Sorts all pokemon by attack in descending order
+
+        Returns:
+            DatabaseQuery: contains all pokemon sorted by attack in descending order
+        """
         data_query = self.dataframe.sort_values(by=["attack"], ascending=False)
         return data_query
 
     def sort_by_defense(self):
+        """
+        Sorts all pokemon by defense in descending order
+
+        Returns:
+            DatabaseQuery: contains all pokemon sorted by defense in descending order
+        """
         data_query = self.dataframe.sort_values(by=["defense"], ascending=False)
         return data_query
 
     def sort_by_speed(self):
+        """
+        Sorts all pokemon by speed in descending order
+
+        Returns:
+            DatabaseQuery: contains all pokemon sorted by speed in descending order
+        """
         data_query = self.dataframe.sort_values(by=["speed"], ascending=False)
         return data_query
     
     def sort_by_sp_defense(self):
+        """
+        Sorts all pokemon by special defense in descending order
+
+        Returns:
+            DatabaseQuery: contains all pokemon sorted by special defense in descending order
+        """
         data_query = self.dataframe.sort_values(by=["sp_defense"], ascending=False)
         return data_query
 
     def sort_by_sp_attack(self):
+        """
+        Sorts all pokemon by special attack in descending order
+
+        Returns:
+            DatabaseQuery: contains all pokemon sorted by special attack in descending order
+        """
         data_query = self.dataframe.sort_values(by=["sp_attack"], ascending=False)
         return data_query
 
     def sort_by_stat(self, stat):
+        """
+        Sorts all pokemon by specified stat in descending order
+
+        Args:
+            stat(str): the stat to sort by
+        Returns:
+            DatabaseQuery: contains all pokemon sorted by specifeid stat in descending order
+        """
         if stat == "hp":
             data_query = self.sort_by_hp()
         elif stat == "attack":
@@ -80,18 +166,42 @@ class DatabaseQuery():
         return DatabaseQuery(data_query)
 
     def index(self, key):
+        """
+        Get the DataRow at the specified index
+        Alias for bracket index lookup
+
+        Args:
+            key(int): The index to be searched for
+        Returns
+            DataRow: contains the pokemon data at the index
+        """
         return self.query[key]
 
     def first(self):
+        """
+        Gets the first item in the database
+
+        Returns:
+            DataRow: contains the pokemon data at the top of the database
+        """
         return self.query[0]
 
     def isempty(self):
+        """
+        Checks if the database is empty
+
+        Returns:
+            bool: True if the database is empty, else False
+        """
         if len(self.query) == 0:
             return True
         else:
             return False
 
 class DataRow():
+    """
+    Data container for pokemon data
+    """
 
     def __init__(self, serial):
         self.index = serial[0]
@@ -140,12 +250,13 @@ class DataRow():
 class Database(DatabaseQuery):
 
     def __init__(self, database="resources/data/data.csv"):
+        """
+        Loads pokemon data from a csv
+        Uses "resources/data/data.csv" as default database
+
+        Args:
+            database(str): Address of the csv to be used
+        """
         self.database_address = database
         self.dataframe = pd.read_csv(self.database_address)
         super().__init__(self.dataframe)
-
-    def get_indices_header(self):
-        return [x for x in range(len(self))]
-
-    def get_names_header(self):
-        return [row.name for row in self]

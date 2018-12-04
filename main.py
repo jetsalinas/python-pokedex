@@ -3,8 +3,8 @@ Main file for python-pokedex
 
 :Author:    Daniel Montecastro
 :Author:    Jose Enrico Salinas
+:Version:   20181204
 """
-
 
 import pyglet
 from pyglet.window import key
