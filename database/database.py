@@ -32,19 +32,51 @@ class DatabaseQuery():
         data_query = self.dataframe.loc[(self.dataframe.type1 == pokemon_type.lower()) | (self.dataframe.type2 == pokemon_type.lower())]
         return DatabaseQuery(data_query)
 
-    def filter_by_stat(self, stat):
-        data_query = self.dataframe.loc[(self.dataframe.hp         == pokemon_type.lower()) | (self.dataframe.attack    == pokemon_type.lower()) |
-                                        (self.dataframe.defense    == pokemon_type.lower()) | (self.dataframe.speed     == pokemon_type.lower()) |
-                                        (self.dataframe.sp_defense == pokemon_type.lower()) | (self.dataframe.sp_attack == pokemon_type.lower()) |
-                                        (self.dataframe.base_total == pokemon_type.lower()) ]
-        return DatabaseQuery(data_query)
-
     def filter_by_legendary(self, value):
         if value == True:
             query = 1
         else:
             query = 0
         data_query = self.dataframe.loc[(self.dataframe.is_legendary == query)]
+        return DatabaseQuery(data_query)
+
+    def sort_by_hp(self):
+        data_query = self.dataframe.sort_values(by=["hp"], ascending=False)
+        return data_query
+
+    def sort_by_attack(self):
+        data_query = self.dataframe.sort_values(by=["attack"], ascending=False)
+        return data_query
+
+    def sort_by_defense(self):
+        data_query = self.dataframe.sort_values(by=["defense"], ascending=False)
+        return data_query
+
+    def sort_by_speed(self):
+        data_query = self.dataframe.sort_values(by=["speed"], ascending=False)
+        return data_query
+    
+    def sort_by_sp_defense(self):
+        data_query = self.dataframe.sort_values(by=["sp_defense"], ascending=False)
+        return data_query
+
+    def sort_by_sp_attack(self):
+        data_query = self.dataframe.sort_values(by=["sp_attack"], ascending=False)
+        return data_query
+
+    def sort_by_stat(self, stat):
+        if stat == "hp":
+            data_query = self.sort_by_hp()
+        elif stat == "attack":
+            data_query = self.sort_by_sp_attack()
+        elif stat == "defense":
+            data_query = self.sort_by_defense()
+        elif stat == "speed":
+            data_query = self.sort_by_speed()
+        elif stat == "spattack":
+            data_query = self.sort_by_sp_attack()
+        elif stat == "spdefense":
+            data_query = self.sort_by_sp_defense()
         return DatabaseQuery(data_query)
 
     def index(self, key):

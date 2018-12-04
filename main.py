@@ -12,6 +12,17 @@ favorites = Favorites()
 current_pokemon = 0
 pyglet.font.add_file("resources/fonts/pkmndp.ttf")
 
+try:
+    music = pyglet.resource.media("resources/media/music.mp3")
+    looper = pyglet.media.SourceGroup(music.audio_format, None)
+    looper.loop = True
+    looper.queue(music)
+    player = pyglet.media.Player()
+    player.queue(looper)
+    player.play()
+except pyglet.media.sources.riff.WAVEFormatException:
+    pass
+
 # Initialize windows
 window = pyglet.window.Window(caption='Pokedex V1.0', width=640, height=480)
 
